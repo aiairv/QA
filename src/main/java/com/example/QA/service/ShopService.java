@@ -1,15 +1,15 @@
 package com.example.QA.service;
 
-import com.example.QA.dto.CityDto;
 import com.example.QA.dto.ShopDto;
-import com.example.QA.dto.ShopDto2;
-import com.example.QA.entity.City;
 import com.example.QA.entity.Shop;
-import com.example.QA.entity.Street;
 import com.example.QA.repository.ShopRepository;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -29,33 +29,34 @@ public class ShopService {
         return dto;
 
     }
-}
 
-//    public List<Shop> getShops(String street, String city, Integer openOrClosed) {
-//        List<Shop> shops = shopRepository.findAll();
-//        if (street != null) {
-//            shops = shops.stream()
-//                    .filter(s -> s.getStreetId().getStreetName().equals(street))
-//                    .collect(Collectors.toList());
-//        }
-//        if (city != null) {
-//            shops = shops.stream()
-//                    .filter(s -> s.getCityId().getCityName().equals(city))
-//                    .collect(Collectors.toList());
-//        }
-//    }
-//}
-//        if (openOrClosed != null){
-//            LocalDateTime now = LocalDateTime.now();
-//            shops = shops.stream()
-//                    .filter(s->{LocalTime openTime = s.getOpenTime();
-//                                LocalTime closeTime = s.getCloseTime();
-//                                if(closeTime.isBefore(LocalTime.now()) && openTime.isAfter(LocalTime.now())){
-//                                    return openOrClosed;
-//                                }
-//                             .collect(Collectors.toList());
-//                    }
-//                    return shops;
-//        }
-//    }
-//}
+
+    public List<Shop> getShops(String street, String city, Boolean isOpen) {
+        List<Shop> shops = shopRepository.findAll();
+        if (street != null) {
+            shops = shops.stream()
+                    .filter(s -> s.getStreetId().getStreetName().equals(street))
+                    .collect(Collectors.toList());
+        }
+        if (city != null) {
+            shops = shops.stream()
+                    .filter(s -> s.getCityId().getCityName().equals(city))
+                    .collect(Collectors.toList());
+        }
+
+        if (isOpen) {
+            List<Shop> shopsIsOpen = new ArrayList<>();
+
+            for (Shop s : shops) {
+                LocalTime openTime = s.getOpenTime();
+                LocalTime closeTime = s.getCloseTime();
+                if (closeTime.isBefore(LocalTime.now()) && openTime.isAfter(LocalTime.now())) {
+                    shopsIsOpen.add(s);
+                }
+            }
+            return shopsIsOpen;
+        }
+        return shops;
+    }
+
+}
