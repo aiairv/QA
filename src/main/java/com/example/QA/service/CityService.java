@@ -28,4 +28,8 @@ public List<CityDto> getAllCities(){
     }
     return dtos;
 }
+
+    public City getById(Long cityId) {
+    return cityRepository.findById(cityId).orElse(new City());
+    }
 }

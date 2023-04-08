@@ -31,4 +31,8 @@ public class StreetService {
         }
         return dtos;
     }
+
+    public Street getById(Long streetId) {
+        return streetRepository.findById(streetId).orElse(new Street());
+    }
 }

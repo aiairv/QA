@@ -20,9 +20,9 @@ public class ShopController {
     }
 
     @GetMapping("/shops")
-    public List<Shop> getShops(@RequestParam String street,
-                               @RequestParam String city,
-                               @RequestParam Boolean isOpen) {
-        return shopService.getShops(street, city, isOpen);
+    public List<Shop> getShops(@RequestParam(required = false) Long streetId,
+                               @RequestParam(required = false) Long cityId,
+                               @RequestParam(required = false) Boolean isOpen) {
+        return shopService.getShops(streetId, cityId, isOpen);
     }
 }

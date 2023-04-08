@@ -1,7 +1,9 @@
 package com.example.QA.service;
 
 import com.example.QA.dto.ShopDto;
+import com.example.QA.entity.City;
 import com.example.QA.entity.Shop;
+import com.example.QA.entity.Street;
 import com.example.QA.repository.ShopRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ShopService {
     ShopRepository shopRepository;
+    StreetService streetService;
+    CityService cityService;
 
     public ShopDto addNewShop(ShopDto dto) {
         Shop shop = new Shop();
@@ -31,17 +35,25 @@ public class ShopService {
     }
 
 
-    public List<Shop> getShops(String street, String city, Boolean isOpen) {
+    public List<Shop> getShops(Long streetId, Long cityId, Boolean isOpen) {
         List<Shop> shops = shopRepository.findAll();
-        if (street != null) {
-            shops = shops.stream()
-                    .filter(s -> s.getStreetId().getStreetName().equals(street))
-                    .collect(Collectors.toList());
+        if (streetId != null) {
+            Street street = streetService.getById(streetId);
+
+            if(street.getId() != null) {
+                shops = shops.stream()
+                        .filter(s -> s.getStreetId().getStreetName().equals(street.getStreetName()))
+                        .collect(Collectors.toList());
+            }
         }
-        if (city != null) {
-            shops = shops.stream()
-                    .filter(s -> s.getCityId().getCityName().equals(city))
-                    .collect(Collectors.toList());
+        if (cityId != null) {
+            City city = cityService.getById(cityId);
+
+            if (city.getId() != null) {
+                shops = shops.stream()
+                        .filter(s -> s.getCityId().getCityName().equals(city.getCityName()))
+                        .collect(Collectors.toList());
+            }
         }
 
         if (isOpen) {
@@ -50,7 +62,7 @@ public class ShopService {
             for (Shop s : shops) {
                 LocalTime openTime = s.getOpenTime();
                 LocalTime closeTime = s.getCloseTime();
-                if (closeTime.isBefore(LocalTime.now()) && openTime.isAfter(LocalTime.now())) {
+                if (closeTime.isAfter(LocalTime.now()) && openTime.isBefore(LocalTime.now())) {
                     shopsIsOpen.add(s);
                 }
             }
